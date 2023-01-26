@@ -9,3 +9,9 @@
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
+
+//DirectX
+#include <d3d11.h>
+
+//Custom
+#include "Constant.h"

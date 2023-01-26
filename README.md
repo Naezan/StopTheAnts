@@ -17,6 +17,13 @@ Simple DirectX2D Project for learning AI
   #Only Debug is possible, Release is not supported
   ```
 
+- Structure
+  - 
+    - main
+	    - Game
+		    - World
+			    - GameObject
+
 - Feature
   - 
     - TO DO
