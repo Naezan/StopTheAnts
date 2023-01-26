@@ -1,5 +1,8 @@
 # Directories
 .vs/
+Debug/
+Release/
+Intermediate/
 
 # Files
 *.user
