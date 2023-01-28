@@ -1,5 +1,8 @@
 #include "pch.h"
 #include "Application.h"
+#include "Game.h"
+#include "Util/Timer.h"
+#include "SubSystem/Input.h"
 
 Application::Application() :
 	m_hwnd(NULL),
@@ -7,7 +10,10 @@ Application::Application() :
 	m_pRenderTarget(NULL),
 	m_pLightSlateGrayBrush(NULL),
 	m_pCornflowerBlueBrush(NULL)
-{}
+{
+	game = std::make_unique<Game>();
+	inputSystem = std::make_unique<Input>();
+}
 
 Application::~Application()
 {
@@ -15,6 +21,14 @@ Application::~Application()
 	SafeRelease(&m_pRenderTarget);
 	SafeRelease(&m_pLightSlateGrayBrush);
 	SafeRelease(&m_pCornflowerBlueBrush);
+
+	// 창을 제거합니다
+	DestroyWindow(m_hwnd);
+	m_hwnd = nullptr;
+
+	// 프로그램 인스턴스를 제거합니다
+	UnregisterClass(szWindowClass, m_hinstance);
+	m_hinstance = nullptr;
 }
 
 HRESULT Application::Initialize(HINSTANCE hInstance)
@@ -30,55 +44,67 @@ HRESULT Application::Initialize(HINSTANCE hInstance)
 
 	if (SUCCEEDED(hr))
 	{
+		// 이 프로그램의 인스턴스를 가져옵니다
+		m_hinstance = GetModuleHandle(NULL);
+
 		// Register the window class.
 		WNDCLASSEX wcex = { sizeof(WNDCLASSEX) };
 		wcex.style = CS_HREDRAW | CS_VREDRAW;
 		wcex.lpfnWndProc = Application::WndProc;
 		wcex.cbClsExtra = 0;
 		wcex.cbWndExtra = sizeof(LONG_PTR);
-		wcex.hInstance = HINST_THISCOMPONENT;
+		wcex.hInstance = m_hinstance;
 		wcex.hbrBackground = NULL;
 		wcex.lpszMenuName = NULL;
 		wcex.hCursor = LoadCursor(NULL, IDI_APPLICATION);
 		wcex.lpszClassName = szWindowClass;
 
+		// windows class를 등록합니다
 		RegisterClassEx(&wcex);
 
-		// In terms of using the correct DPI, to create a window at a specific size
-		// like this, the procedure is to first create the window hidden. Then we get
-		// the actual DPI from the HWND (which will be assigned by whichever monitor
-		// the window is created on). Then we use SetWindowPos to resize it to the
-		// correct DPI-scaled size, then we use ShowWindow to show it.
+		RECT window_rect;
+		window_rect.left = 0;
+		window_rect.top = 0;
+		window_rect.right = SCREEN_WIDTH;
+		window_rect.bottom = SCREEN_HEIGHT;
+
+		AdjustWindowRectEx(&window_rect,
+			WS_OVERLAPPEDWINDOW,
+			0, 0
+		);
+
+		// 모니터 화면의 해상도를 읽어옵니다
+		// 윈도우 창 가로, 세로 넓이 변수 초기화
+
+		// 윈도우 모드의 경우 800 * 800 크기를 지정합니다.
+		int screenWidth = window_rect.right - window_rect.left;
+		int screenHeight = window_rect.bottom - window_rect.top;
+		// 윈도우 창을 가로, 세로의 정 가운데 오도록 합니다.
+		int posX = (GetSystemMetrics(SM_CXSCREEN) - screenWidth) / 2;
+		int posY = (GetSystemMetrics(SM_CYSCREEN) - screenHeight) / 2;
 
 		m_hwnd = CreateWindow(
 			szWindowClass,
 			szTitle,
 			WS_OVERLAPPEDWINDOW,
-			CW_USEDEFAULT,
-			CW_USEDEFAULT,
-			0,
-			0,
+			posX, posY, screenWidth, screenHeight,
 			NULL,
 			NULL,
-			HINST_THISCOMPONENT,
+			m_hinstance,
 			this);
 
 		if (m_hwnd)
 		{
-			// Because the SetWindowPos function takes its size in pixels, we
-			// obtain the window's DPI, and use it to scale the window size.
-			float dpi = static_cast<float>(GetDpiForWindow(m_hwnd));
+			// 윈도우를 화면에 표시하고 포커스를 지정합니다
+			ShowWindow(m_hwnd, SW_SHOW);
+			SetForegroundWindow(m_hwnd);
+			SetFocus(m_hwnd);
 
-			SetWindowPos(
-				m_hwnd,
-				NULL,
-				0,
-				0,
-				static_cast<int>(ceil(SCREEN_WIDTH * dpi / 96.f)),
-				static_cast<int>(ceil(SCREEN_HEIGHT * dpi / 96.f)),
-				SWP_NOMOVE);
-			ShowWindow(m_hwnd, SW_SHOWNORMAL);
-			UpdateWindow(m_hwnd);
+			//여기에 초기화를 호출합니다.
+			if (!inputSystem->Init(m_hinstance, m_hwnd, screenWidth, screenHeight))
+			{
+				MessageBox(m_hwnd, L"Could not initialize the input object.", L"Error", MB_OK);
+			}
 		}
 	}
 
@@ -88,11 +114,42 @@ HRESULT Application::Initialize(HINSTANCE hInstance)
 void Application::RunMessageLoop()
 {
 	MSG msg;
-
-	while (GetMessage(&msg, NULL, 0, 0))
+	Timer timer;
+	while (true)
 	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+
+		if (msg.message == WM_QUIT)
+			break;
+
+		// 여기서 게임 코드 실행
+		timer.UpdateTimer();
+		timer.RenderTimer(m_hwnd, szTitle);
+
+		//Update
+		int mouseX = 0, mouseY = 0;
+		inputSystem->Update();
+		inputSystem->GetMouseLocation(mouseX, mouseY);
+
+		//Print Mouse Position
+		{
+			FILE* fp;
+
+			AllocConsole();
+			freopen_s(&fp, "CONIN$", "r", stdin);
+			freopen_s(&fp, "CONOUT$", "w", stdout);
+			freopen_s(&fp, "CONOUT$", "w", stderr);
+			std::cout << mouseX << " " << mouseY << std::endl;
+		}
+
+		game->Update(timer.GetDeltaTime());
+
+		//Render
+		game->Render();
 	}
 }
 
@@ -173,7 +230,7 @@ HRESULT Application::OnRender()
 		int width = static_cast<int>(rtSize.width);
 		int height = static_cast<int>(rtSize.height);
 
-		for (int x = 0; x < width; x += 24)
+		for (int x = 0; x < width; x += 20)
 		{
 			m_pRenderTarget->DrawLine(
 				D2D1::Point2F(static_cast<FLOAT>(x), 0.0f),
@@ -183,7 +240,7 @@ HRESULT Application::OnRender()
 			);
 		}
 
-		for (int y = 0; y < height; y += 24)
+		for (int y = 0; y < height; y += 20)
 		{
 			m_pRenderTarget->DrawLine(
 				D2D1::Point2F(0.0f, static_cast<FLOAT>(y)),

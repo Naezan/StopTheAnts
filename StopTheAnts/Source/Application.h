@@ -44,9 +44,13 @@ private:
 private:
     WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
     WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
+    HINSTANCE m_hinstance;
     HWND m_hwnd;
     ID2D1Factory* m_pDirect2dFactory;
     ID2D1HwndRenderTarget* m_pRenderTarget;
     ID2D1SolidColorBrush* m_pLightSlateGrayBrush;
     ID2D1SolidColorBrush* m_pCornflowerBlueBrush;
+
+    std::unique_ptr<class Game> game;
+    std::unique_ptr<class Input> inputSystem;
 };

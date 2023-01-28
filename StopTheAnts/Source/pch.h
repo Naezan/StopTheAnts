@@ -11,6 +11,14 @@
 #include <tchar.h>
 #include <wchar.h>
 #include <math.h>
+#include <iostream>
+#include <string>
+#include <functional>
+#include <list>
+#include <vector>
+#include <unordered_map>
+#include <string>
+#include <crtdbg.h>
 
 //DirectX
 #include <d2d1.h>
@@ -20,6 +28,7 @@
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
+#include <dinput.h>
 
 //Custom
 #include "Constant.h"
