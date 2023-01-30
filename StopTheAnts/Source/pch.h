@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <utility>
 #include <stdlib.h>
+#include <array>
 
 //DirectX
 #include <d2d1.h>

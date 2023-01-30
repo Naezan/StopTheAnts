@@ -37,6 +37,9 @@
     <Filter Include="Source Files\GameObject">
       <UniqueIdentifier>{fd65944c-62cf-4f92-a095-097f221c2a74}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Util">
+      <UniqueIdentifier>{0f84fbae-46f9-4487-9833-d82552998f1c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Application.h">
@@ -87,6 +90,12 @@
     <ClInclude Include="Source\GameObject\GameObject.h">
       <Filter>Source Files\GameObject</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Util\Node.h">
+      <Filter>Source Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Util\Math.h">
+      <Filter>Source Files\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Application.cpp">
@@ -106,6 +115,9 @@
     </ClCompile>
     <ClCompile Include="Source\GameObject\GameObject.cpp">
       <Filter>Source Files\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Math\AStar.cpp">
+      <Filter>Source Files\Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
