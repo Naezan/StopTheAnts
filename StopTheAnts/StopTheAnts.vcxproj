@@ -89,6 +89,7 @@
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Constant.h" />
     <ClInclude Include="Source\Game.h" />
+    <ClInclude Include="Source\GameObject\GameObject.h" />
     <ClInclude Include="Source\Macro.h" />
     <ClInclude Include="Source\Math\AStar.h" />
     <ClInclude Include="Source\Math\Bresenham.h" />
@@ -96,9 +97,6 @@
     <ClInclude Include="Source\Math\QeadTree.h" />
     <ClInclude Include="Source\Math\Raycast.h" />
     <ClInclude Include="Source\pch.h" />
-    <ClInclude Include="Source\Renderer\BufferLayout.h" />
-    <ClInclude Include="Source\Renderer\IndexBuffer.h" />
-    <ClInclude Include="Source\Renderer\VertexBuffer.h" />
     <ClInclude Include="Source\Resource.h" />
     <ClInclude Include="Source\SubSystem\FSM.h" />
     <ClInclude Include="Source\SubSystem\Input.h" />
@@ -108,9 +106,8 @@
   <ItemGroup>
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\Game.cpp" />
+    <ClCompile Include="Source\GameObject\GameObject.cpp" />
     <ClCompile Include="Source\main.cpp" />
-    <ClCompile Include="Source\Renderer\IndexBuffer.cpp" />
-    <ClCompile Include="Source\Renderer\VertexBuffer.cpp" />
     <ClCompile Include="Source\SubSystem\Input.cpp" />
     <ClCompile Include="Source\Util\Timer.cpp" />
   </ItemGroup>

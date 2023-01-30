@@ -28,6 +28,8 @@ public:
 	// Process and dispatch messages
 	void RunMessageLoop();
 
+	inline std::unique_ptr<class Input>& GetInput() { return inputSystem; }
+
 	void GetMousePosition(int& outX, int& outY);
 
 private:

@@ -19,6 +19,9 @@ Application::Application() :
 
 Application::~Application()
 {
+	//ShutDown함수를 여기서 호출합니다.
+	inputSystem->ShutDown();
+
 	SafeRelease(&m_pDirect2dFactory);
 	SafeRelease(&m_pRenderTarget);
 	SafeRelease(&m_pLightSlateGrayBrush);
@@ -271,7 +274,7 @@ HRESULT Application::Render()
 			hr = S_OK;
 			DiscardDeviceResources();
 
-			//여기서 ShutDown함수를 호출합니다.
+			//여기서 게임의 ShutDown함수를 호출합니다.
 			game->ShutDown();
 		}
 	}

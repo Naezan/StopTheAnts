@@ -10,6 +10,9 @@ public:
 	bool Update();
 	void ShutDown();
 
+	bool IsKeyPressed(const unsigned char keycode);
+	bool IsLeftMouseButtonPressed();
+	bool IsRightMouseButtonPressed();
 	bool IsEscapePressed();
 	void GetMouseLocation(int& outx, int& outy);
 

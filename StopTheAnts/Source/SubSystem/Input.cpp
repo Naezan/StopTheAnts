@@ -120,6 +120,21 @@ void Input::ShutDown()
 	}
 }
 
+bool Input::IsKeyPressed(const unsigned char keycode)
+{
+	return m_keyboardState[keycode] & 0x80;
+}
+
+bool Input::IsLeftMouseButtonPressed()
+{
+	return m_mouseState.rgbButtons[0] & 0x80;
+}
+
+bool Input::IsRightMouseButtonPressed()
+{
+	return m_mouseState.rgbButtons[1] & 0x80;
+}
+
 bool Input::IsEscapePressed()
 {
 	// escape 키가 현재 눌려지고 있는지 bit값을 계산하여 확인한다.

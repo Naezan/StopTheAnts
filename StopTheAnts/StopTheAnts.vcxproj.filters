@@ -34,6 +34,9 @@
     <Filter Include="Source Files\Renderer">
       <UniqueIdentifier>{971dc485-414a-47d5-935c-b341fc733f77}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\GameObject">
+      <UniqueIdentifier>{fd65944c-62cf-4f92-a095-097f221c2a74}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Application.h">
@@ -81,14 +84,8 @@
     <ClInclude Include="Source\SubSystem\FSM.h">
       <Filter>Source Files\SubSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Renderer\VertexBuffer.h">
-      <Filter>Source Files\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Renderer\IndexBuffer.h">
-      <Filter>Source Files\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Renderer\BufferLayout.h">
-      <Filter>Source Files\Renderer</Filter>
+    <ClInclude Include="Source\GameObject\GameObject.h">
+      <Filter>Source Files\GameObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -107,11 +104,8 @@
     <ClCompile Include="Source\SubSystem\Input.cpp">
       <Filter>Source Files\Input</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Renderer\VertexBuffer.cpp">
-      <Filter>Source Files\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Renderer\IndexBuffer.cpp">
-      <Filter>Source Files\Renderer</Filter>
+    <ClCompile Include="Source\GameObject\GameObject.cpp">
+      <Filter>Source Files\GameObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
