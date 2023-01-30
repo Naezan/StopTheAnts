@@ -13,9 +13,39 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{7c0b5089-a443-4ece-87bb-25cafb75df09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shader">
+      <UniqueIdentifier>{bcce9656-17e2-469b-a446-28ac6f22c910}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Math">
+      <UniqueIdentifier>{55f6480d-47e3-4a08-85c2-a1173e11175f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Timer">
+      <UniqueIdentifier>{88a3dbd8-71ef-4015-8172-747c91386fc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Input">
+      <UniqueIdentifier>{6b5e1973-ee95-4845-90b9-1361592be5b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\SubSystem">
+      <UniqueIdentifier>{5d0d1b47-8f71-4bf8-b8f9-85ab1eb8540c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Renderer">
+      <UniqueIdentifier>{971dc485-414a-47d5-935c-b341fc733f77}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Application.h">
+      <Filter>Source Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Macro.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Source\pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Constant.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Resource.h">
@@ -24,58 +54,64 @@
     <ClInclude Include="Source\targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Constant.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Macro.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Application.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Source\Game.h">
+      <Filter>Source Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="Source\Math\AStar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Math\QeadTree.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Math</Filter>
     </ClInclude>
     <ClInclude Include="Source\Math\Bresenham.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Math</Filter>
     </ClInclude>
     <ClInclude Include="Source\Math\EulerIntegral.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Source\SubSystem\FSM.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Game.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Source\Math\QeadTree.h">
+      <Filter>Source Files\Math</Filter>
     </ClInclude>
     <ClInclude Include="Source\Math\Raycast.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Math</Filter>
     </ClInclude>
     <ClInclude Include="Source\Util\Timer.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Timer</Filter>
     </ClInclude>
     <ClInclude Include="Source\SubSystem\Input.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SubSystem\FSM.h">
+      <Filter>Source Files\SubSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\VertexBuffer.h">
+      <Filter>Source Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\IndexBuffer.h">
+      <Filter>Source Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\BufferLayout.h">
+      <Filter>Source Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Application.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\main.cpp">
+      <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\Util\Timer.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Timer</Filter>
     </ClCompile>
     <ClCompile Include="Source\SubSystem\Input.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\VertexBuffer.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\IndexBuffer.cpp">
+      <Filter>Source Files\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -93,7 +129,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resource\Shader\shaders.shader">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Shader</Filter>
     </None>
   </ItemGroup>
 </Project>

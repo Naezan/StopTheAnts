@@ -19,6 +19,9 @@
 #include <unordered_map>
 #include <string>
 #include <crtdbg.h>
+#include <algorithm>
+#include <utility>
+#include <stdlib.h>
 
 //DirectX
 #include <d2d1.h>
@@ -29,6 +32,7 @@
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
 #include <dinput.h>
+//#include "Math/SimpleMath.h"
 
 //Custom
 #include "Constant.h"

@@ -4,6 +4,8 @@
 #include "Util/Timer.h"
 #include "SubSystem/Input.h"
 
+std::shared_ptr<Application> Application::instance;
+
 Application::Application() :
 	m_hwnd(NULL),
 	m_pDirect2dFactory(NULL),
@@ -100,7 +102,7 @@ HRESULT Application::Initialize(HINSTANCE hInstance)
 			SetForegroundWindow(m_hwnd);
 			SetFocus(m_hwnd);
 
-			//여기에 초기화를 호출합니다.
+			//여기에 기본적인 초기화를 호출합니다.
 			if (!inputSystem->Init(m_hinstance, m_hwnd, screenWidth, screenHeight))
 			{
 				MessageBox(m_hwnd, L"Could not initialize the input object.", L"Error", MB_OK);
@@ -131,26 +133,29 @@ void Application::RunMessageLoop()
 		timer.RenderTimer(m_hwnd, szTitle);
 
 		//Update
-		int mouseX = 0, mouseY = 0;
 		inputSystem->Update();
-		inputSystem->GetMouseLocation(mouseX, mouseY);
 
 		//Print Mouse Position
 		{
-			FILE* fp;
-
+			/*FILE* fp;
+			
 			AllocConsole();
 			freopen_s(&fp, "CONIN$", "r", stdin);
 			freopen_s(&fp, "CONOUT$", "w", stdout);
 			freopen_s(&fp, "CONOUT$", "w", stderr);
-			std::cout << mouseX << " " << mouseY << std::endl;
+			std::cout << mouseX << " " << mouseY << std::endl;*/
 		}
 
 		game->Update(timer.GetDeltaTime());
 
 		//Render
-		game->Render();
+		Render();
 	}
+}
+
+void Application::GetMousePosition(int& outX, int& outY)
+{
+	inputSystem->GetMouseLocation(outX, outY);
 }
 
 HRESULT Application::CreateDeviceIndependentResources()
@@ -200,6 +205,12 @@ HRESULT Application::CreateDeviceResources()
 				&m_pCornflowerBlueBrush
 			);
 		}
+
+		//게임의 초기화를 호출합니다.
+		if (SUCCEEDED(hr))
+		{
+			hr = game->InitColor(m_pRenderTarget);
+		}
 	}
 
 	return hr;
@@ -212,7 +223,7 @@ void Application::DiscardDeviceResources()
 	SafeRelease(&m_pCornflowerBlueBrush);
 }
 
-HRESULT Application::OnRender()
+HRESULT Application::Render()
 {
 	HRESULT hr = S_OK;
 
@@ -250,12 +261,18 @@ HRESULT Application::OnRender()
 			);
 		}
 
+		//여기에서 게임을 렌더링합니다.
+		game->Render();
+
 		hr = m_pRenderTarget->EndDraw();
 
 		if (hr == D2DERR_RECREATE_TARGET)
 		{
 			hr = S_OK;
 			DiscardDeviceResources();
+
+			//여기서 ShutDown함수를 호출합니다.
+			game->ShutDown();
 		}
 	}
 
@@ -324,7 +341,6 @@ LRESULT Application::WndProc(HWND _hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
 			case WM_PAINT:
 			{
-				pDemoApp->OnRender();
 				ValidateRect(_hWnd, NULL);
 			}
 			result = 0;
