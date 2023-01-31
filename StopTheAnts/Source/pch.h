@@ -23,6 +23,7 @@
 #include <utility>
 #include <stdlib.h>
 #include <array>
+#include <queue>
 
 //DirectX
 #include <d2d1.h>

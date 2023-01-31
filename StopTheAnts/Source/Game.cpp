@@ -3,8 +3,9 @@
 #include "Application.h"
 #include "SubSystem/Input.h"
 #include "GameObject/GameObject.h"
+#include "Math/QeadTree.h"
 
-Game::Game(): nodes(BOARD_HEIGHT, std::vector<Node*>(BOARD_WIDTH, nullptr))
+Game::Game() : nodes(BOARD_HEIGHT, std::vector<std::shared_ptr<Node>>(BOARD_WIDTH, std::make_shared<Node>()))
 {
 	std::fill(&m_Board[0][0], &m_Board[0][0] + 1600, QuadType::None);
 	m_DrawQuadType = QuadType::Wall;
@@ -74,18 +75,20 @@ void Game::Update(float deltaTime)
 	if (Application::GetInstance().lock()->GetInput()->IsLeftMouseButtonPressed())
 	{
 		//TODO 상황에 따라 클래스의 타입이 달라야 한다
-		//TODO 개미집이랑 나뭇잎의 개수는 1개차이를 넘어설 수 없다.
-		//개미집과 나뭇잎이 1대1로 매칭되서 AStar가 계산된다.
-		qaudObject.emplace_back(m_pDrawBrush, std::make_pair(m_MousePositionX, m_MousePositionY));
+		//개미집이 추가되었을때 leaf벡터에서 가장 가까운 leaf를 찾습니다.
+		//혹은 leaf가 추가되었을때 개미집의 leaf를 갱신합니다.
+
 		m_Board[m_MousePositionY][m_MousePositionX] = m_DrawQuadType;
-		
+
+		qaudObject.emplace_back(m_pDrawBrush, std::make_pair(m_MousePositionX, m_MousePositionY));
+
 		//노드의 obstacle설정
 		SetNodeCollision(m_MousePositionX, m_MousePositionY);
 
-		//TODO Ant들 UpdatePath실행
+		//TODO AntHouse들 UpdateAntPath실행
 	}
 
-	//TODO Ant들 MoveBasedOnVelocity실행
+	//TODO AntHouse들 Update실행
 }
 
 void Game::Render()

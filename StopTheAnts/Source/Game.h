@@ -21,7 +21,7 @@ public:
 	void Render();
 	void RenderQuad(int x, int y, ID2D1SolidColorBrush* colorBrush);
 
-	void ShutDown();         // closes Direct3D and releases memory
+	void ShutDown();
 
 	void KeyInputProcess();
 
@@ -41,11 +41,12 @@ private:
 
 	QuadType m_DrawQuadType;
 
-	//오브젝트 구조체(타입, 위치)
 	std::vector<class Object> qaudObject;
 
 	int m_MousePositionX;
 	int m_MousePositionY;
 
-	std::vector<std::vector<struct Node*>> nodes;
+	std::vector<std::vector<std::shared_ptr<struct Node>>> nodes;
+	//개미집을 생성할때 가장 가까운 leaf위치를 찾을때 사용합니다.
+	std::vector<class Leaf> leafs;
 };

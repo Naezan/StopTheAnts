@@ -29,8 +29,12 @@ public:
 	AntHouse(ID2D1SolidColorBrush* brushType, std::pair<int, int>&& pos);
 	~AntHouse();
 
-private:
+	void Update();
+	void UpdateAntPath(std::vector<std::vector<std::shared_ptr<Node>>>& nodes);
 
+private:
+	std::vector<class Ant*> m_Ants;
+	std::weak_ptr<Node> m_DestLeaf;
 };
 
 class Leaf : public Object
@@ -49,11 +53,12 @@ public:
 	Ant(ID2D1SolidColorBrush* brushType, std::pair<int, int>&& pos);
 	~Ant();
 
-	void UpdatePath(std::vector<std::vector<Node*>>& nodes);
+	void Update();
+	void UpdatePath(std::vector<std::vector<std::shared_ptr<Node>>>& nodes);
 	void MoveBasedOnVelocity();
 
 private:
 	//FSM
-	Node* m_House;
-	Node* m_Leaf;
+	std::weak_ptr<Node> m_House;
+	std::weak_ptr<Node> m_Leaf;
 };

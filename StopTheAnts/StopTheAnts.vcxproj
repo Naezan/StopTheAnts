@@ -111,6 +111,8 @@
     <ClCompile Include="Source\GameObject\GameObject.cpp" />
     <ClCompile Include="Source\main.cpp" />
     <ClCompile Include="Source\Math\AStar.cpp" />
+    <ClCompile Include="Source\Math\Bresenham.cpp" />
+    <ClCompile Include="Source\Math\QeadTree.cpp" />
     <ClCompile Include="Source\SubSystem\Input.cpp" />
     <ClCompile Include="Source\Util\Timer.cpp" />
   </ItemGroup>

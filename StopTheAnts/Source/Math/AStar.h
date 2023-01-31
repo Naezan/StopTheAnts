@@ -4,7 +4,7 @@
 
 namespace AStar
 {
-	static void InitNodes(std::vector<std::vector<Node*>>& nodes)
+	static void InitNodes(std::vector<std::vector<std::shared_ptr<Node>>>& nodes)
 	{
 		for (int x = 0; x < BOARD_WIDTH; x++)
 			for (int y = 0; y < BOARD_HEIGHT; y++)
@@ -12,7 +12,7 @@ namespace AStar
 				nodes[y][x]->position.x = x; // ...because we give each node its own coordinates
 				nodes[y][x]->position.y = y; // ...because we give each node its own coordinates
 				nodes[y][x]->bObstacle = false;
-				nodes[y][x]->parent = nullptr;
+				nodes[y][x]->parent.reset();
 				nodes[y][x]->bVisited = false;
 			}
 
@@ -42,7 +42,7 @@ namespace AStar
 			}
 	}
 
-	static void FindPath(std::vector<std::vector<Node*>>& nodes, Node* nodeStart, Node* nodeEnd)
+	static void FindPath(std::vector<std::vector<std::shared_ptr<Node>>>& nodes, std::weak_ptr<Node> nodeStart, std::weak_ptr<Node> nodeEnd)
 	{
 		// Reset Navigation Graph - default all node states
 		for (int x = 0; x < BOARD_WIDTH; ++x)
@@ -51,7 +51,7 @@ namespace AStar
 				nodes[y][x]->bVisited = false;
 				nodes[y][x]->fGlobalGoal = INFINITY;
 				nodes[y][x]->fLocalGoal = INFINITY;
-				nodes[y][x]->parent = nullptr;	// No parents
+				nodes[y][x]->parent.reset();	// No parents
 			}
 
 		auto heuristic = [](Vec2D s, Vec2D e) -> int {
@@ -60,28 +60,28 @@ namespace AStar
 		};
 
 		// Setup starting conditions
-		Node* nodeCurrent = nodeStart;
-		nodeStart->fLocalGoal = 0.0f;
-		nodeStart->fGlobalGoal = static_cast<float>(heuristic(nodeStart->position, nodeEnd->position));
+		std::weak_ptr<Node> nodeCurrent = nodeStart;
+		nodeStart.lock()->fLocalGoal = 0.0f;
+		nodeStart.lock()->fGlobalGoal = static_cast<float>(heuristic(nodeStart.lock()->position, nodeEnd.lock()->position));
 
 		// Add start node to not tested list - this will ensure it gets tested.
 		// As the algorithm progresses, newly discovered nodes get added to this
 		// list, and will themselves be tested later
-		std::list<Node*> listNotTestedNodes;
+		std::list<std::weak_ptr<Node>> listNotTestedNodes;
 		listNotTestedNodes.push_back(nodeStart);
 
 		// if the not tested list contains nodes, there may be better paths
 		// which have not yet been explored. However, we will also stop 
 		// searching when we reach the target - there may well be better
 		// paths but this one will do - it wont be the longest.
-		while (!listNotTestedNodes.empty() && nodeCurrent != nodeEnd)// Find absolutely shortest path // && nodeCurrent != nodeEnd)
+		while (!listNotTestedNodes.empty() && nodeCurrent.lock() != nodeEnd.lock())// Find absolutely shortest path // && nodeCurrent != nodeEnd)
 		{
 			// Sort Untested nodes by global goal, so lowest is first
-			listNotTestedNodes.sort([](const Node* lhs, const Node* rhs) { return lhs->fGlobalGoal < rhs->fGlobalGoal; });
+			listNotTestedNodes.sort([](const std::weak_ptr<Node> lhs, const std::weak_ptr<Node> rhs) { return lhs.lock()->fGlobalGoal < rhs.lock()->fGlobalGoal; });
 
 			// Front of listNotTestedNodes is potentially the lowest distance node. Our
 			// list may also contain nodes that have been visited, so ditch these...
-			while (!listNotTestedNodes.empty() && listNotTestedNodes.front()->bVisited)
+			while (!listNotTestedNodes.empty() && listNotTestedNodes.front().lock()->bVisited)
 				listNotTestedNodes.pop_front();
 
 			// ...or abort because there are no valid nodes left to test
@@ -89,34 +89,34 @@ namespace AStar
 				break;
 
 			nodeCurrent = listNotTestedNodes.front();
-			nodeCurrent->bVisited = true; // We only explore a node once
+			nodeCurrent.lock()->bVisited = true; // We only explore a node once
 
 
 			// Check each of this node's neighbours...
-			for (auto nodeNeighbour : nodeCurrent->vecNeighbours)
+			for (auto nodeNeighbour : nodeCurrent.lock()->vecNeighbours)
 			{
 				// ... and only if the neighbour is not visited and is 
 				// not an obstacle, add it to NotTested List
-				if (!nodeNeighbour->bVisited && nodeNeighbour->bObstacle == 0)
+				if (!nodeNeighbour.lock()->bVisited && nodeNeighbour.lock()->bObstacle == 0)
 					listNotTestedNodes.push_back(nodeNeighbour);
 
 				// Calculate the neighbours potential lowest parent distance
-				float fPossiblyLowerGoal = nodeCurrent->fLocalGoal + heuristic(nodeCurrent->position, nodeNeighbour->position);
+				float fPossiblyLowerGoal = nodeCurrent.lock()->fLocalGoal + heuristic(nodeCurrent.lock()->position, nodeNeighbour.lock()->position);
 
 				// If choosing to path through this node is a lower distance than what 
 				// the neighbour currently has set, update the neighbour to use this node
 				// as the path source, and set its distance scores as necessary
-				if (fPossiblyLowerGoal < nodeNeighbour->fLocalGoal)
+				if (fPossiblyLowerGoal < nodeNeighbour.lock()->fLocalGoal)
 				{
-					nodeNeighbour->parent = nodeCurrent;
-					nodeNeighbour->fLocalGoal = fPossiblyLowerGoal;
+					nodeNeighbour.lock()->parent = nodeCurrent;
+					nodeNeighbour.lock()->fLocalGoal = fPossiblyLowerGoal;
 
 					// The best path length to the neighbour being tested has changed, so
 					// update the neighbour's score. The heuristic is used to globally bias
 					// the path algorithm, so it knows if its getting better or worse. At some
 					// point the algo will realise this path is worse and abandon it, and then go
 					// and search along the next best path.
-					nodeNeighbour->fGlobalGoal = nodeNeighbour->fLocalGoal + heuristic(nodeNeighbour->position, nodeEnd->position);
+					nodeNeighbour.lock()->fGlobalGoal = nodeNeighbour.lock()->fLocalGoal + heuristic(nodeNeighbour.lock()->position, nodeEnd.lock()->position);
 				}
 			}
 		}
