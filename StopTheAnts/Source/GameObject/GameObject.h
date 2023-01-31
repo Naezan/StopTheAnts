@@ -32,9 +32,11 @@ public:
 	void Update();
 	void UpdateAntPath(std::vector<std::vector<std::shared_ptr<Node>>>& nodes);
 
-private:
-	std::vector<class Ant*> m_Ants;
+	float m_Distance = INFINITY;
 	std::weak_ptr<Node> m_DestLeaf;
+private:
+	//TODO 개미 생성은 여기서 합니다. 이때 개미의 House와 Leaf를 지정해줍니다.
+	std::vector<class Ant*> m_Ants;
 };
 
 class Leaf : public Object

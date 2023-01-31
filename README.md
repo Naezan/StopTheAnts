@@ -43,6 +43,7 @@ Simple DirectX2D Project for learning AI
 
 - TO DO List
   - 
+    - [ ] 개미 생성 및 Move함수(오일러 적분)
     - [ ] FSM
     - [x] ~~grid system~~
       * ~~좌표평면은 왼쪽위가 (0, 0)에서 시작하고 -가 왼쪽과 아래쪽, +가 오른쪽과 위쪽이다~~
@@ -52,9 +53,9 @@ Simple DirectX2D Project for learning AI
       * ~~숫자키로 블럭 타입 변경~~
       * ~~블럭 타입에 맞게 블럭이 커서를 따라 다님~~
       * ~~마우스 휠로 블럭 크기 변경~~
-    - [ ] Math
+    - [x] ~~Math~~
       * ~~PathFinding(A*)~~ or ~~브레젠험~~
-      * 오일러 적분
+      * ~~오일러 적분~~(적절하지 않을 수 있다)
       * ~~쿼드 트리~~(사용할려 했으나 적합하지 않았다)
 
 - Reference

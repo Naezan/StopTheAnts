@@ -7,8 +7,8 @@
 
 Game::Game() : nodes(BOARD_HEIGHT, std::vector<std::shared_ptr<Node>>(BOARD_WIDTH, std::make_shared<Node>()))
 {
-	std::fill(&m_Board[0][0], &m_Board[0][0] + 1600, QuadType::None);
-	m_DrawQuadType = QuadType::Wall;
+	std::fill(&m_Board[0][0], &m_Board[0][0] + 1600, QuadType::Q_None);
+	m_MouseQuadType = QuadType::Q_Wall;
 
 	//콘솔창 생성
 	/*FILE* fp;
@@ -74,21 +74,29 @@ void Game::Update(float deltaTime)
 
 	if (Application::GetInstance().lock()->GetInput()->IsLeftMouseButtonPressed())
 	{
-		//TODO 상황에 따라 클래스의 타입이 달라야 한다
-		//개미집이 추가되었을때 leaf벡터에서 가장 가까운 leaf를 찾습니다.
-		//혹은 leaf가 추가되었을때 개미집의 leaf를 갱신합니다.
+		//이미 있는곳에는 칠하지 않습니다.
+		if (m_Board[m_MousePositionY][m_MousePositionX] != QuadType::Q_None)
+			return;
 
-		m_Board[m_MousePositionY][m_MousePositionX] = m_DrawQuadType;
+		m_Board[m_MousePositionY][m_MousePositionX] = m_MouseQuadType;
 
-		qaudObject.emplace_back(m_pDrawBrush, std::make_pair(m_MousePositionX, m_MousePositionY));
+		AddQuadObjectByQuadType(m_MouseQuadType);
 
 		//노드의 obstacle설정
 		SetNodeCollision(m_MousePositionX, m_MousePositionY);
 
-		//TODO AntHouse들 UpdateAntPath실행
+		//AntHouse들 UpdateAntPath실행
+		for (auto& house : antHouses)
+		{
+			house.lock()->UpdateAntPath(nodes);
+		}
 	}
 
-	//TODO AntHouse들 Update실행
+	//AntHouse들 Update실행
+	for (auto& house : antHouses)
+	{
+		house.lock()->Update();
+	}
 }
 
 void Game::Render()
@@ -98,7 +106,7 @@ void Game::Render()
 
 	for (auto& obj : qaudObject)
 	{
-		RenderQuad(obj.position.first, obj.position.second, obj.m_BrushType);
+		RenderQuad(obj->position.first, obj->position.second, obj->m_BrushType);
 	}
 }
 
@@ -108,10 +116,10 @@ void Game::RenderQuad(int x, int y, ID2D1SolidColorBrush* colorBrush)
 		return;
 
 	D2D1_RECT_F rect = D2D1::RectF(
-		x * 20,
-		y * 20,
-		x * 20 + 20,
-		y * 20 + 20
+		static_cast<float>(x * 20),
+		static_cast<float>(y * 20),
+		static_cast<float>(x * 20 + 20),
+		static_cast<float>(y * 20 + 20)
 	);
 
 	// Draw a filled rectangle.
@@ -132,19 +140,19 @@ void Game::KeyInputProcess()
 	{
 		//장애물
 		m_pDrawBrush = m_pBlackBrush;
-		m_DrawQuadType = QuadType::Wall;
+		m_MouseQuadType = QuadType::Q_Wall;
 	}
 	if (Application::GetInstance().lock()->GetInput()->IsKeyPressed(DIK_2))
 	{
 		//개미집
 		m_pDrawBrush = m_pBrownBrush;
-		m_DrawQuadType = QuadType::AntHouse;
+		m_MouseQuadType = QuadType::Q_AntHouse;
 	}
 	if (Application::GetInstance().lock()->GetInput()->IsKeyPressed(DIK_3))
 	{
 		//나뭇잎
 		m_pDrawBrush = m_pGreenBrush;
-		m_DrawQuadType = QuadType::Leaf;
+		m_MouseQuadType = QuadType::Q_Leaf;
 	}
 	if (Application::GetInstance().lock()->GetInput()->IsKeyPressed(DIK_4))
 	{
@@ -155,21 +163,71 @@ void Game::KeyInputProcess()
 
 void Game::SetNodeCollision(int x, int y)
 {
-	switch (m_DrawQuadType)
+	switch (m_MouseQuadType)
 	{
-	case QuadType::None:
+	case QuadType::Q_None:
 		nodes[y][x]->bObstacle = false;
-	case QuadType::Wall:
+	case QuadType::Q_Wall:
 		nodes[y][x]->bObstacle = true;
 		break;
-	case QuadType::AntHouse:
+	case QuadType::Q_AntHouse:
 		nodes[y][x]->bObstacle = true;
 		break;
-	case QuadType::Leaf:
+	case QuadType::Q_Leaf:
 		nodes[y][x]->bObstacle = true;
 		break;
 	default:
 		nodes[y][x]->bObstacle = false;
 		break;
+	}
+}
+
+void Game::AddQuadObjectByQuadType(QuadType type)
+{
+	switch (type)
+	{
+	case Q_Wall:
+		AddQuadObject<Wall>(m_pDrawBrush, std::make_pair(m_MousePositionX, m_MousePositionY));
+		break;
+	case Q_AntHouse:
+	{
+		auto house = antHouses.emplace_back(AddQuadObject<AntHouse>(m_pDrawBrush, std::make_pair(m_MousePositionX, m_MousePositionY)));
+		//개미집이 추가되었을때 leaf벡터를 순회하면서 최단거리 leaf를 갱신합니다. 시간복잡도는 N입니다.
+		SetShortestLeafByLoopingLeaf(house);
+	}
+	break;
+	case Q_Leaf:
+	{
+		auto leaf = leafs.emplace_back(AddQuadObject<Leaf>(m_pDrawBrush, std::make_pair(m_MousePositionX, m_MousePositionY)));
+		//leaf가 추가되었을때 모든개미집들과 leaf를 비교하여 갱신합니다. 시간복잡도는 N입니다.
+		SetShortestLeafByLoopingHouse(leaf);
+	}
+	break;
+	}
+}
+
+void Game::SetShortestLeafByLoopingLeaf(std::weak_ptr<class AntHouse> house)
+{
+	for (auto& leaf : leafs)
+	{
+		float checkDist = Math::Distance(house.lock()->position.first, house.lock()->position.second, leaf.lock()->position.first, leaf.lock()->position.first);
+		if (checkDist < house.lock()->m_Distance)
+		{
+			house.lock()->m_DestLeaf = nodes[leaf.lock()->position.second][leaf.lock()->position.first];
+			house.lock()->m_Distance = std::move(checkDist);
+		}
+	}
+}
+
+void Game::SetShortestLeafByLoopingHouse(std::weak_ptr<class Leaf> leaf)
+{
+	for (auto& house : antHouses)
+	{
+		float checkDist = Math::Distance(leaf.lock()->position.first, leaf.lock()->position.second, leaf.lock()->position.first, leaf.lock()->position.first);
+		if (checkDist < house.lock()->m_Distance)
+		{
+			house.lock()->m_DestLeaf = nodes[leaf.lock()->position.second][leaf.lock()->position.first];
+			house.lock()->m_Distance = std::move(checkDist);
+		}
 	}
 }

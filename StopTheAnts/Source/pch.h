@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <array>
 #include <queue>
+#include <typeinfo>
 
 //DirectX
 #include <d2d1.h>

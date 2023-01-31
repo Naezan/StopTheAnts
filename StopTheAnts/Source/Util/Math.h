@@ -25,11 +25,11 @@ namespace Math
 
 	static constexpr float Distance(const Vec2D& l, const Vec2D& r)
 	{
-		return (l.x - r.x) * (l.x - r.x) + (l.y - r.y) * (l.y - r.y);
+		return static_cast<float>((l.x - r.x) * (l.x - r.x) + (l.y - r.y) * (l.y - r.y));
 	}
 
 	static constexpr float Distance(int x1, int y1, int x2, int y2)
 	{
-		return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
+		return static_cast<float>((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 	}
 }
