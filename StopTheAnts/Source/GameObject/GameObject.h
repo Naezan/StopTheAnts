@@ -23,20 +23,27 @@ private:
 
 };
 
-class AntHouse : public Object
+class AntHouse : public Object, std::enable_shared_from_this<AntHouse>
 {
 public:
 	AntHouse(ID2D1SolidColorBrush* brushType, std::pair<int, int>&& pos);
 	~AntHouse();
 
-	void Update();
+	void Update(float deltaTime);
+	void Render(ID2D1HwndRenderTarget* d2dhWnd);
 	void UpdateAntPath(std::vector<std::vector<std::shared_ptr<Node>>>& nodes);
 
 	float m_Distance = INFINITY;
-	std::weak_ptr<Node> m_DestLeaf;
+	std::weak_ptr<Node> m_StartNode;
+	std::weak_ptr<Node> m_DestNode;
+
+	std::deque<Vec2D> nodePosition;
 private:
 	//TODO 개미 생성은 여기서 합니다. 이때 개미의 House와 Leaf를 지정해줍니다.
-	std::vector<class Ant*> m_Ants;
+	ID2D1SolidColorBrush* m_AntBrush;
+	std::vector<std::unique_ptr<class Ant>> m_Ants;
+
+	int m_MaxAntCount = 100;
 };
 
 class Leaf : public Object
@@ -52,15 +59,16 @@ private:
 class Ant: public Object
 {
 public:
-	Ant(ID2D1SolidColorBrush* brushType, std::pair<int, int>&& pos);
+	Ant(ID2D1SolidColorBrush* brushType, std::pair<int, int> pos, std::weak_ptr<Node> houseNode, std::weak_ptr<Node> leafNode);
 	~Ant();
 
-	void Update();
-	void UpdatePath(std::vector<std::vector<std::shared_ptr<Node>>>& nodes);
-	void MoveBasedOnVelocity();
+	void Update(float deltaTime);
+	void Render(ID2D1HwndRenderTarget* d2dhWnd, ID2D1SolidColorBrush* colorBrush);
+	void MoveBasedOnVelocity(float deltaTime);
 
-private:
-	//FSM
+	std::weak_ptr<AntHouse> m_ParentHouse;
 	std::weak_ptr<Node> m_House;
 	std::weak_ptr<Node> m_Leaf;
+private:
+	//FSM
 };

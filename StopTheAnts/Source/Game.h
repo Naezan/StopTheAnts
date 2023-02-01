@@ -16,6 +16,7 @@ public:
 	~Game();
 
 public:
+	void InitNode();
 	HRESULT InitColor(ID2D1HwndRenderTarget* d2dhWnd);
 	void Update(float deltaTime);
 	void Render();
@@ -38,6 +39,9 @@ public:
 		return std::dynamic_pointer_cast<T>(qaudObject.emplace_back(std::make_shared<T>(brushType, std::move(pos))));
 	}
 
+public:
+	ID2D1SolidColorBrush* m_pBlueBrush;
+
 private:
 	ID2D1HwndRenderTarget* m_d2dhWnd;
 
@@ -45,7 +49,6 @@ private:
 	ID2D1SolidColorBrush* m_pBlackBrush;
 	ID2D1SolidColorBrush* m_pBrownBrush;
 	ID2D1SolidColorBrush* m_pGreenBrush;
-	ID2D1SolidColorBrush* m_pBlueBrush;
 
 	std::array<std::array<QuadType, BOARD_WIDTH>, BOARD_HEIGHT> m_Board;
 

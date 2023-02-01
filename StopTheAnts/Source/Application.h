@@ -32,6 +32,8 @@ public:
 
 	void GetMousePosition(int& outX, int& outY);
 
+	inline std::unique_ptr<class Game>& GetGameInstance() { return game; }
+
 private:
 	// Initialize device-independent resources.
 	HRESULT CreateDeviceIndependentResources();

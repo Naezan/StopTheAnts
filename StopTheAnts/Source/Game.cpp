@@ -5,10 +5,13 @@
 #include "GameObject/GameObject.h"
 #include "Math/QeadTree.h"
 
-Game::Game() : nodes(BOARD_HEIGHT, std::vector<std::shared_ptr<Node>>(BOARD_WIDTH, std::make_shared<Node>()))
+Game::Game() : nodes(BOARD_HEIGHT, std::vector<std::shared_ptr<Node>>(BOARD_WIDTH))
 {
+
 	std::fill(&m_Board[0][0], &m_Board[0][0] + 1600, QuadType::Q_None);
 	m_MouseQuadType = QuadType::Q_Wall;
+
+	InitNode();
 
 	//콘솔창 생성
 	/*FILE* fp;
@@ -22,6 +25,37 @@ Game::Game() : nodes(BOARD_HEIGHT, std::vector<std::shared_ptr<Node>>(BOARD_WIDT
 Game::~Game()
 {
 	ShutDown();
+}
+
+void Game::InitNode()
+{
+	for (int x = 0; x < BOARD_WIDTH; ++x)
+	{
+		for (int y = 0; y < BOARD_HEIGHT; ++y)
+		{
+			nodes[y][x] = std::make_shared<Node>();
+			nodes[y][x]->position.x = x;
+			nodes[y][x]->position.y = y;
+			nodes[y][x]->bObstacle = false;
+			nodes[y][x]->parent.reset();
+			nodes[y][x]->bVisited = false;
+		}
+	}
+
+	for (int x = 0; x < BOARD_WIDTH; ++x)
+	{
+		for (int y = 0; y < BOARD_HEIGHT; ++y)
+		{
+			if (y > 0)
+				nodes[y][x]->vecNeighbours.push_back(nodes[y - 1][x]);
+			if (y < BOARD_HEIGHT - 1)
+				nodes[y][x]->vecNeighbours.push_back(nodes[y + 1][x]);
+			if (x > 0)
+				nodes[y][x]->vecNeighbours.push_back(nodes[y][x - 1]);
+			if (x < BOARD_WIDTH - 1)
+				nodes[y][x]->vecNeighbours.push_back(nodes[y][x + 1]);
+		}
+	}
 }
 
 HRESULT Game::InitColor(ID2D1HwndRenderTarget* d2dhWnd)
@@ -74,6 +108,9 @@ void Game::Update(float deltaTime)
 
 	if (Application::GetInstance().lock()->GetInput()->IsLeftMouseButtonPressed())
 	{
+		if (m_MousePositionX < 0 || m_MousePositionX > 40 || m_MousePositionY < 0 || m_MousePositionY > 40)
+			return;
+
 		//이미 있는곳에는 칠하지 않습니다.
 		if (m_Board[m_MousePositionY][m_MousePositionX] != QuadType::Q_None)
 			return;
@@ -95,7 +132,7 @@ void Game::Update(float deltaTime)
 	//AntHouse들 Update실행
 	for (auto& house : antHouses)
 	{
-		house.lock()->Update();
+		house.lock()->Update(deltaTime);
 	}
 }
 
@@ -107,6 +144,12 @@ void Game::Render()
 	for (auto& obj : qaudObject)
 	{
 		RenderQuad(obj->position.first, obj->position.second, obj->m_BrushType);
+	}
+
+	//개미를 렌더링합니다.
+	for (auto& house : antHouses)
+	{
+		house.lock()->Render(m_d2dhWnd);
 	}
 }
 
@@ -213,7 +256,8 @@ void Game::SetShortestLeafByLoopingLeaf(std::weak_ptr<class AntHouse> house)
 		float checkDist = Math::Distance(house.lock()->position.first, house.lock()->position.second, leaf.lock()->position.first, leaf.lock()->position.first);
 		if (checkDist < house.lock()->m_Distance)
 		{
-			house.lock()->m_DestLeaf = nodes[leaf.lock()->position.second][leaf.lock()->position.first];
+			house.lock()->m_StartNode = nodes[house.lock()->position.second][house.lock()->position.first];
+			house.lock()->m_DestNode = nodes[leaf.lock()->position.second][leaf.lock()->position.first];
 			house.lock()->m_Distance = std::move(checkDist);
 		}
 	}
@@ -226,7 +270,8 @@ void Game::SetShortestLeafByLoopingHouse(std::weak_ptr<class Leaf> leaf)
 		float checkDist = Math::Distance(leaf.lock()->position.first, leaf.lock()->position.second, leaf.lock()->position.first, leaf.lock()->position.first);
 		if (checkDist < house.lock()->m_Distance)
 		{
-			house.lock()->m_DestLeaf = nodes[leaf.lock()->position.second][leaf.lock()->position.first];
+			house.lock()->m_StartNode = nodes[house.lock()->position.second][house.lock()->position.first];
+			house.lock()->m_DestNode = nodes[leaf.lock()->position.second][leaf.lock()->position.first];
 			house.lock()->m_Distance = std::move(checkDist);
 		}
 	}

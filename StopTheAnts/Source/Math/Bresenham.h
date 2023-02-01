@@ -4,7 +4,7 @@
 
 namespace Bresenham
 {
-	static bool FindStraightPath(const std::vector<std::vector<std::shared_ptr<Node>>>& nodes, const Vec2D& start, const Vec2D& end)
+	static bool FindStraightPath(const std::vector<std::vector<std::shared_ptr<Node>>>& nodes, const Vec2D& start, const Vec2D& end, std::deque<Vec2D>& outPos)
 	{
 		int width = end.x - start.x;
 		int height = end.y - start.y;
@@ -31,7 +31,7 @@ namespace Bresenham
 		//경사 낮음
 		if (isGradularSlope)
 		{
-			for (x = start.x; x <= end.x; x += dx)
+			for (x = start.x + dx; x < end.x; x += dx)
 			{
 				//조건검사
 				if (f < 0)
@@ -46,13 +46,16 @@ namespace Bresenham
 				//만약에 노드위치가 obstacle이면 return false;
 				if(nodes[y][x]->bObstacle)
 					return false;
+
+				//노드위치 하나씩 추가
+				outPos.push_back(Vec2D{x, y});
 			}
 			return true;
 		}
 		//경사 높음
 		else
 		{
-			for (y = start.y; y <= end.y; y += dy)
+			for (y = start.y + dy; y < end.y; y += dy)
 			{
 				//조건검사
 				if (f < 0)
@@ -67,6 +70,9 @@ namespace Bresenham
 				//만약에 노드위치가 obstacle이면 return false;
 				if (nodes[y][x]->bObstacle)
 					return false;
+
+				//노드위치 하나씩 추가
+				outPos.push_back(Vec2D{ x, y });
 			}
 			return true;
 		}

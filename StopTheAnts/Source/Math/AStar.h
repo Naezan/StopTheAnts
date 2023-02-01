@@ -4,45 +4,7 @@
 
 namespace AStar
 {
-	static void InitNodes(std::vector<std::vector<std::shared_ptr<Node>>>& nodes)
-	{
-		for (int x = 0; x < BOARD_WIDTH; x++)
-			for (int y = 0; y < BOARD_HEIGHT; y++)
-			{
-				nodes[y][x]->position.x = x; // ...because we give each node its own coordinates
-				nodes[y][x]->position.y = y; // ...because we give each node its own coordinates
-				nodes[y][x]->bObstacle = false;
-				nodes[y][x]->parent.reset();
-				nodes[y][x]->bVisited = false;
-			}
-
-		// Create connections - in this case nodes are on a regular grid
-		for (int x = 0; x < BOARD_WIDTH; x++)
-			for (int y = 0; y < BOARD_HEIGHT; y++)
-			{
-				if (y > 0)
-					nodes[y][x]->vecNeighbours.push_back(nodes[y - 1][x]);
-				if (y < BOARD_HEIGHT - 1)
-					nodes[y][x]->vecNeighbours.push_back(nodes[y + 1][x]);
-				if (x > 0)
-					nodes[y][x]->vecNeighbours.push_back(nodes[y][x - 1]);
-				if (x < BOARD_WIDTH - 1)
-					nodes[y][x]->vecNeighbours.push_back(nodes[y][x + 1]);
-
-				// We can also connect diagonally
-				/*if (y>0 && x>0)
-					nodes[y*nMapWidth + x].vecNeighbours.push_back(&nodes[(y - 1) * nMapWidth + (x - 1)]);
-				if (y<nMapHeight-1 && x>0)
-					nodes[y*nMapWidth + x].vecNeighbours.push_back(&nodes[(y + 1) * nMapWidth + (x - 1)]);
-				if (y>0 && x<nMapWidth-1)
-					nodes[y*nMapWidth + x].vecNeighbours.push_back(&nodes[(y - 1) * nMapWidth + (x + 1)]);
-				if (y<nMapHeight - 1 && x<nMapWidth-1)
-					nodes[y*nMapWidth + x].vecNeighbours.push_back(&nodes[(y + 1) * nMapWidth + (x + 1)]);
-				*/
-			}
-	}
-
-	static void FindPath(std::vector<std::vector<std::shared_ptr<Node>>>& nodes, std::weak_ptr<Node> nodeStart, std::weak_ptr<Node> nodeEnd)
+	static void FindPath(std::vector<std::vector<std::shared_ptr<Node>>>& nodes, std::weak_ptr<Node> nodeStart, std::weak_ptr<Node> nodeEnd, std::deque<Vec2D>& outPos)
 	{
 		// Reset Navigation Graph - default all node states
 		for (int x = 0; x < BOARD_WIDTH; ++x)
